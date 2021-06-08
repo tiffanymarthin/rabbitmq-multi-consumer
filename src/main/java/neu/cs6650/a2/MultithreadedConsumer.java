@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,16 +60,28 @@ public class MultithreadedConsumer {
       }
     };
 
-//    String[] threadId = new String[MAX_THREADS];
-//
-//    for (int i = 0; i < MAX_THREADS; i++) {
-//      String name = "consumer" + i;
-//      threadId[i] = name;
-//    }
+    ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
+
     for (int i = 0; i < MAX_THREADS; i++) {
-      Thread thread = new Thread(runnable);
-      thread.start();
+//      Thread thread = new Thread(runnable);
+//      thread.start();
+      executorService.submit(runnable);
     }
+
+//    try {
+//      int tries = 0;
+//      executorService.shutdown();
+//      while (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+//        executorService.shutdownNow();
+//        if (++tries > 3) {
+//          logger.fatal("Unable to shutdown thread executor. Calling System.exit()...");
+//          System.exit(0);
+//        }
+//      }
+//    } catch (InterruptedException e) {
+//      executorService.shutdownNow();
+//      Thread.currentThread().interrupt();
+//    }
 
 //    System.out.println(wordMap.size());
 //    for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
