@@ -1,6 +1,6 @@
 /* TODO:
   - How to print the concurrent hash map after it's completed (race condition)
-  - Implement the pooling
+  - Implement the pooling (? is this in servlet or here)
   - Does executor service need to be shut down?
 * */
 
@@ -12,7 +12,6 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,10 +44,10 @@ public class MultithreadedConsumer {
           String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 //            System.out.println(message);
           channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-//            System.out.println(WordCount.updateMap(message, wordMap));
-          for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
-            System.out.println(entry.getKey() + " val: " + entry.getValue());
-          }
+          WordCount.updateMap(message, wordMap);
+//          for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
+//            System.out.println(entry.getKey() + " val: " + entry.getValue());
+//          }
           logger.info("Callback thread ID = " + Thread.currentThread().getId() + " Received: " + message);
         };
         channel.basicConsume(QUEUE_NAME, false, deliverCallback, consumerTag -> { });
