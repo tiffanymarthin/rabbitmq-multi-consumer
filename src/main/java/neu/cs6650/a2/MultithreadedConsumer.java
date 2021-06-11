@@ -23,13 +23,25 @@ public class MultithreadedConsumer {
   private static final Logger logger = LogManager.getLogger(MultithreadedConsumer.class.getName());
   private final static String QUEUE_NAME = "wordCountQueue";
   private final static Integer MAX_MESSAGE_PER_RECEIVER = 1;
-  private final static Integer MAX_THREADS = 128;
+  private static Integer MAX_THREADS = 5;
+  private static String host_name = "34.217.114.96";
 
   private static ConcurrentHashMap<String, Integer> wordMap = new ConcurrentHashMap<>();
 
   public static void main(String[] args) throws IOException, TimeoutException {
+    // Command line arguments for easier tests
+    //TODO validates the inputs
+    if (args.length != 0) {
+      host_name = args[0];
+      MAX_THREADS = Integer.parseInt(args[1]);
+    }
+
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("localhost");
+//    factory.setHost("localhost");
+    // TODO REMOVE THIS OR USE VENV
+    factory.setUsername("test");
+    factory.setPassword("test");
+    factory.setHost(host_name);
     final Connection connection = factory.newConnection();
 
     Runnable runnable = () -> {
@@ -48,7 +60,7 @@ public class MultithreadedConsumer {
 //          for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
 //            System.out.println(entry.getKey() + " val: " + entry.getValue());
 //          }
-          logger.info("Callback thread ID = " + Thread.currentThread().getId() + " Received: " + message);
+//          logger.info("Callback thread ID = " + Thread.currentThread().getId() + " Received: " + message);
         };
         channel.basicConsume(QUEUE_NAME, false, deliverCallback, consumerTag -> { });
       } catch (IOException e) {
@@ -59,9 +71,9 @@ public class MultithreadedConsumer {
     ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
 
     for (int i = 0; i < MAX_THREADS; i++) {
-//      Thread thread = new Thread(runnable);
-//      thread.start();
-      executorService.submit(runnable);
+      Thread thread = new Thread(runnable);
+      thread.start();
+//      executorService.submit(runnable);
     }
 
 //    try {
