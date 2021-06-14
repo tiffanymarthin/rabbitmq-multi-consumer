@@ -3,29 +3,28 @@ package neu.cs6650.a2;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Util class to update word count hash map
+ */
 public class WordCount {
 
-  public static int updateMap(String message, Map<String, Integer> map) {
+  /**
+   * Updates the word count in the specified map given a new message
+   *
+   * @param message specified message to be processed and added to the map
+   * @param map     specified map to be updated
+   */
+  public static void updateMap(String message, Map<String, Integer> map) {
     Gson gson = new Gson();
-//    String jsonObject = gson.toJson(message);
-
-    JsonElement jelem = gson.fromJson(message, JsonElement.class);
-    JsonObject jsonObject = jelem.getAsJsonObject();
-    int initialSize = map.size();
-    int afterSize = map.size();
+    JsonElement jsonElement = gson.fromJson(message, JsonElement.class);
+    JsonObject jsonObject = jsonElement.getAsJsonObject();
     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
       String key = entry.getKey();
-//      System.out.println(key);
       JsonElement value = entry.getValue();
-      if (!map.containsKey(key)) afterSize++;
       map.put(key, map.getOrDefault(key, 0) + value.getAsInt());
     }
-    return afterSize;
   }
 
 //  public static void main(String[] args) {
